@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://bxwyn84frxif0"]
+
+[ext_resource type="Texture2D" uid="uid://dc163c38ayxmn" path="res://pieces.png" id="1_gakex"]
+[ext_resource type="Script" path="res://scripts/piece.gd" id="1_j3s25"]
+
+[node name="Piece" type="Node2D"]
+script = ExtResource("1_j3s25")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(3, 3)
+texture = ExtResource("1_gakex")
+region_enabled = true
+region_rect = Rect2(0, 0, 16, 16)
