@@ -1,27 +1,27 @@
-[gd_scene load_steps=3 format=3 uid="uid://qw02dhlx5yle"]
+[gd_scene format=3 uid="uid://qw02dhlx5yle"]
 
-[ext_resource type="Script" path="res://scripts/game.gd" id="1_di1s4"]
-[ext_resource type="Script" path="res://scripts/board.gd" id="1_n6plr"]
+[ext_resource type="Script" uid="uid://cyotqrw04fywe" path="res://scripts/game.gd" id="1_di1s4"]
+[ext_resource type="Script" uid="uid://dggkufpqi2i3k" path="res://scripts/board.gd" id="1_n6plr"]
 
-[node name="Game" type="Node2D"]
+[node name="Game" type="Node2D" unique_id=70521626]
 script = ExtResource("1_di1s4")
 
-[node name="Board" type="Node2D" parent="."]
+[node name="Board" type="Node2D" parent="." unique_id=1444035916]
 script = ExtResource("1_n6plr")
 
-[node name="Control" type="Control" parent="."]
+[node name="Control" type="Control" parent="." unique_id=675268757]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 482.0
 offset_bottom = 482.0
 
-[node name="ColorRect" type="ColorRect" parent="Control"]
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=221893565]
 layout_mode = 0
 offset_right = 487.0
 offset_bottom = 488.0
 color = Color(0.164706, 0.164706, 0.164706, 0.729412)
 
-[node name="Win Label" type="Label" parent="Control"]
+[node name="Win Label" type="Label" parent="Control" unique_id=1383329652]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -37,7 +37,7 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 35
 text = "Player ONE WON"
 
-[node name="Button" type="Button" parent="Control"]
+[node name="Button" type="Button" parent="Control" unique_id=680954451]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

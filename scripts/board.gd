@@ -20,7 +20,7 @@ func draw_board():
 
 func draw_cell(x, y):
 	var rect = ColorRect.new()
-	rect.color = Color(0.8, 0.6, 0.4) if (x + y) % 2 == 0 else Color(0.4, 0.3, 0.2)
+	rect.color = Color(1.0, 1.0, 1.0, 1.0) if (x + y) % 2 == 0 else Color(0.0, 0.0, 0.0, 1.0)
 	rect.size = Vector2(CELL_SIZE, CELL_SIZE)
 	rect.position = Vector2(
 		x * CELL_SIZE,
