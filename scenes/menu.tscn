@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://menu_scene_001"]
+
+[ext_resource type="Script" path="res://scripts/menu.gd" id="1_menu"]
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_menu")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+stretch_mode = 6
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -80.0
+offset_right = 100.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Pixel Chess"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="PlayButton" type="Button" parent="VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 45)
+theme_override_font_sizes/font_size = 18
+text = "Play"
+
+[node name="ModeButtons" type="VBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="AIButton" type="Button" parent="VBox/ModeButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 45)
+theme_override_font_sizes/font_size = 16
+text = "vs AI"
+
+[node name="Spacer2" type="Control" parent="VBox/ModeButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+
+[node name="TwoPlayerButton" type="Button" parent="VBox/ModeButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 45)
+theme_override_font_sizes/font_size = 16
+text = "Two Players"
+
+[connection signal="pressed" from="VBox/PlayButton" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="VBox/ModeButtons/AIButton" to="." method="_on_ai_pressed"]
+[connection signal="pressed" from="VBox/ModeButtons/TwoPlayerButton" to="." method="_on_two_player_pressed"]

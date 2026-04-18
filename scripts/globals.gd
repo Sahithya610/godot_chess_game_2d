@@ -18,6 +18,12 @@ enum PIECE_TYPES {
 	PAWN
 }
 
+# Set by the menu before loading the game scene
+var selected_mode = PLAYER_2_TYPE.AI
+
+# Set by game.gd before switching to gameover scene
+var game_result: String = ""
+
 const SPRITE_MAPPING = {
 	COLORS.BLACK : {
 		PIECE_TYPES.ROOK: Vector2i(0, 4),

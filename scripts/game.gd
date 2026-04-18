@@ -4,6 +4,12 @@ extends Node2D
 const DIFFICULTY = {"EASY": 1, "HARD": 3}
 var ai_depth = DIFFICULTY["HARD"]
 
+# --- Last move arrow ---
+var last_move_from: Vector2 = Vector2(-1, -1)
+var last_move_to: Vector2   = Vector2(-1, -1)
+const ARROW_COLOR = Color(0.75, 0.75, 0.75, 0.7)
+const CELL_SIZE_ARROW = 60
+
 # --- Piece Values (centipawns) ---
 const PIECE_VALUES = {
 	Globals.PIECE_TYPES.PAWN:   100,
@@ -106,15 +112,36 @@ var selected_piece = null;
 var previous_position = null;
 var move_indicators = []
 
-@onready var board = $Board;
-@onready var ui_control = $Control
-@onready var win_label = $"Control/Win Label"
+@onready var board = $Board
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	init_game()
-	ui_control.hide()
-	win_label.hide()
+
+func _draw():
+	if last_move_from == Vector2(-1, -1):
+		return
+	var cs = float(CELL_SIZE_ARROW)
+	var from_px = Vector2(last_move_from.x * cs + cs * 0.5, last_move_from.y * cs + cs * 0.5)
+	var to_px   = Vector2(last_move_to.x   * cs + cs * 0.5, last_move_to.y   * cs + cs * 0.5)
+
+	if from_px.distance_to(to_px) < 1.0:
+		return
+
+	var dir  = (to_px - from_px).normalized()
+	var perp = Vector2(-dir.y, dir.x)
+
+	# Shaft — start/end pulled in so it doesn't cover the piece centres
+	var shaft_start = from_px + dir * 16.0
+	var shaft_end   = to_px   - dir * 22.0
+
+	draw_line(shaft_start, shaft_end, ARROW_COLOR, 5.0, true)
+
+	# Arrowhead triangle
+	var tip   = to_px - dir * 5.0
+	var base_l = shaft_end + perp * 12.0
+	var base_r = shaft_end - perp * 12.0
+	draw_colored_polygon(PackedVector2Array([tip, base_l, base_r]), ARROW_COLOR)
 	
 func _input(event):
 	if game_over or ai_thinking:
@@ -123,8 +150,9 @@ func _input(event):
 	if Input.is_action_just_pressed("left_click"):
 		var pos = get_pos_under_mouse()
 		selected_piece = board.get_piece(pos)
-		# Drag piece only if they are under the mouse or are of current player
-		if selected_piece == null or selected_piece.color != status:
+		# In AI mode only allow moving the human's color; in two-player allow whoever's turn it is
+		var allowed_color = status if player2_type == Globals.PLAYER_2_TYPE.HUMAN else player_color
+		if selected_piece == null or selected_piece.color != allowed_color:
 			return
 		is_dragging = true
 		previous_position = selected_piece.position
@@ -146,7 +174,7 @@ func _input(event):
 			return
 		
 		# If playerA has made valid move, then switch to other player's move
-		if is_valid_move:
+		if is_valid_move and player2_type == Globals.PLAYER_2_TYPE.AI:
 			player2_move()
 
 func init_game():
@@ -154,8 +182,7 @@ func init_game():
 	is_dragging = false 
 	player_color = Globals.COLORS.WHITE
 	status = Globals.COLORS.WHITE
-	#player2_type = Globals.PLAYER_2_TYPE.HUMAN
-	player2_type = Globals.PLAYER_2_TYPE.AI
+	player2_type = Globals.selected_mode
 
 func get_pos_under_mouse():
 	var pos = get_global_mouse_position()
@@ -166,15 +193,14 @@ func get_pos_under_mouse():
 func drop_piece():
 	var to_move = get_pos_under_mouse()
 	if valid_move(selected_piece.board_position, to_move):
-		# For valid move:
-		# - if target has piece, then replace it
 		var dest_piece = board.get_piece(to_move)
-		# Delete only if the target piece is of different color
 		if dest_piece != null and dest_piece.color != selected_piece.color:
 			board.delete_piece(dest_piece)
+		last_move_from = selected_piece.board_position
+		last_move_to   = to_move
 		selected_piece.move_position(to_move)
-		# - change current status of active color
 		status = Globals.COLORS.BLACK if status == Globals.COLORS.WHITE else Globals.COLORS.WHITE
+		queue_redraw()
 		return true
 	return false
 
@@ -461,11 +487,14 @@ func order_moves(moves: Array, board_state) -> Array:
 	)
 
 func move_piece(piece, pos):
+	last_move_from = piece.board_position
+	last_move_to   = pos
 	var dest_piece = board.get_piece(pos)
 	if dest_piece != null and dest_piece.color != piece.color:
 		board.delete_piece(dest_piece)
 	piece.move_position(pos)
 	status = Globals.COLORS.BLACK if status == Globals.COLORS.WHITE else Globals.COLORS.WHITE
+	queue_redraw()
 	evaluate_end_game()
 
 func evaluate_end_game():
@@ -479,16 +508,17 @@ func evaluate_end_game():
 
 func set_win(who: Globals.PLAYER):
 	game_over = true
-	if who == Globals.PLAYER.ONE:
-		win_label.text = "Player One Won"
+	if player2_type == Globals.PLAYER_2_TYPE.HUMAN:
+		Globals.game_result = "White Won!" if status == Globals.COLORS.BLACK else "Black Won!"
 	else:
-		win_label.text = "Player Two Won"
-	win_label.show()
-	ui_control.show()
+		Globals.game_result = "Player One Won!" if who == Globals.PLAYER.ONE else "Player Two Won!"
+	get_tree().change_scene_to_file("res://scenes/gameover.tscn")
 
-
-func _on_button_pressed():
+func _on_restart_pressed():
 	get_tree().reload_current_scene()
+
+func _on_quit_pressed():
+	get_tree().change_scene_to_file("res://scenes/menu.tscn")
 
 func show_valid_moves(piece):
 	clear_move_indicators()
